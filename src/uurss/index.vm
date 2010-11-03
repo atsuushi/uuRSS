@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;CHARSET=Shift_JIS">
+<link rel="stylesheet" type="text/css" href="../style.css">
+<title>$title</title>
+</head>
+<body>
+
+<h1>$title</h1>
+
+<div class="content">
+#foreach ( $day in $days )
+<hr><h2><a href="${day}.html">${day}</a></h2>
+#set ( $m = $summary.get($day) )
+<ul>
+  #foreach ( $result in $m.entrySet() )
+  <li>${result.key.fullname}</li>    
+  <ul>
+    #foreach ( $entry in $result.value )
+    <li><a href="${entry.link}">${entry.title}</a></li>    
+    #end
+  </ul>
+  #end
+</ul>
+#end
+</div>
+
+<hr><p>$version</p>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;CHARSET=Shift_JIS">
+<link rel="stylesheet" type="text/css" href="../style.css">
+<title>$title</title>
+</head>
+<body>
+
+<p style="text-align: center;">
+#foreach ( $i in [ -2, -1, 0, 1, 2] )
+  #if ( $i == 0 )
+*<a href="../index.html">INDEX</a>*
+  #else
+  #set ( $adjust = $day + $i )
+*<a href="${adjust}.html">${adjust}</a>*
+  #end
+#end
+</p>
+
+<div class="content">
+#foreach ( $result in $results.entrySet() )
+#set ( $info = $result.key )
+<hr><h2><a href="${info.feedUrl}">${info.fullname}</a></h2>
+  #foreach ( $entry in $result.value )
+<h3><a href="${entry.link}">${entry.title}</a></h3>${entry.description}
+  #end
+#end
+</div>
+
+<hr><p>$version</p>
+
+</body>
+</html>
