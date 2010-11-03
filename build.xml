@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     uuRSS
+     RSS Reader
+     ====================================================================== -->
+<project name="uuRSS" default="build">
+
+    <!-- PROPERTIES -->
+    <property name="jar" value="uuRSS.jar" />
+    <property name="src" value="src" />
+    <property name="bin" value="dist" />
+    <property name="lib" value="lib" />
+    <path id="classpathid">
+        <fileset dir="${lib}">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: clean                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="clean">
+        <mkdir dir="${bin}" />
+        <delete includeEmptyDirs="yes">
+            <fileset dir="${bin}" includes="**" />
+        </delete>
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: compile
+         - - - - - - - - - - - - - - - - - -->
+    <target name="compile">
+        <mkdir dir="${bin}" />
+        <javac fork="yes"
+               srcdir="${src}"
+               destdir="${bin}"
+               classpathref="classpathid"
+               source="1.5"
+               target="1.5"
+               optimize="yes"
+               deprecation="no"
+               debug="yes"
+               debuglevel="source,lines">
+            <include name="**/*.java" />
+        </javac>
+        <copy todir="${bin}">
+            <fileset dir="${src}">
+                <include name="**/*.properties" />
+                <include name="**/*.vm" />
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: archive
+         - - - - - - - - - - - - - - - - - -->
+    <target name="archive" depends="compile">
+        <jar destfile="${jar}">
+            <fileset dir="${bin}">
+                <include name="uurss/**" />
+                <include name="log4j.properties" />
+            </fileset>
+        </jar>
+    </target>
+
+    <!-- ================================= 
+          target: build
+         ================================= -->
+    <target name="build" depends="archive" />
+
+</project>
