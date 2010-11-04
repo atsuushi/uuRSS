@@ -3,7 +3,7 @@
 rem set JDBCMODE=true
 
 set CLASSPATH=bin;uurss.jar
-set CLASSPATH=%CLASSPATH%;lib\rome-1.0.jar;lib\log4j-1.2.12.jar;lib\velocity-dep-1.5.jar;lib\jdom-1.0.jar
+set CLASSPATH=%CLASSPATH%;lib\rome-1.0.jar;lib\log4j-1.2.15.jar;lib\velocity-dep-1.5.jar;lib\jdom-1.0.jar
 set CLASSPATH=%CLASSPATH%;lib\sqlite-jdbc-3.6.13.jar
 set OP=-Dresult.dir=result
 

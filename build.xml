@@ -69,9 +69,9 @@
         <antcall target="download-if-not-have" />
     </target>
     <target name="download-Velocity">
-        <property name="url" value="${url.default}" />
-        <property name="path" value="velocity/jars" />
-        <property name="name" value="velocity-1.5" />
+        <property name="url" value="http://archive.apache.org" />
+        <property name="path" value="dist/velocity/engine/1.5" />
+        <property name="name" value="velocity-dep-1.5" />
         <antcall target="download-if-not-have" />
     </target>
     <target name="download-Log4j">
