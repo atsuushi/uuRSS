@@ -16,6 +16,11 @@
         </fileset>
     </path>
 
+    <!-- PROPERTIES (for download) -->
+    <property name="url.default" value="http://www.ibiblio.org/maven" />
+    <property name="proxy.host" value="" />
+    <property name="proxy.port" value="80" />
+
     <!-- - - - - - - - - - - - - - - - - - 
           target: clean                      
          - - - - - - - - - - - - - - - - - -->
@@ -27,9 +32,59 @@
     </target>
 
     <!-- - - - - - - - - - - - - - - - - - 
+          target: download
+         - - - - - - - - - - - - - - - - - -->
+    <target name="download">
+        <mkdir dir="${lib}" />
+        <antcall target="download-ROME" />
+        <antcall target="download-JDOM" />
+        <antcall target="download-Velocity" />
+        <antcall target="download-Log4j" />
+    </target>
+    <target name="download-if-not-have">
+        <property name="lib.path" value="lib/${name}.jar" />
+        <condition property="exists-lib">
+            <available file="${lib.path}" />
+        </condition>
+        <antcall target="download-lib" />
+    </target>
+    <target name="download-lib" unless="exists-lib">
+        <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}" />
+        <get src="${url}/${path}/${name}.jar"
+             dest="${lib.path}"
+             usetimestamp="true"
+             verbose="false"
+             ignoreerrors="false" />
+    </target>
+    <target name="download-ROME">
+        <property name="url" value="https://rome.dev.java.net" />
+        <property name="path" value="dist" />
+        <property name="name" value="rome-1.0" />
+        <antcall target="download-if-not-have" />
+    </target>
+    <target name="download-JDOM">
+        <property name="url" value="${url.default}" />
+        <property name="path" value="jdom/jars" />
+        <property name="name" value="jdom-1.0" />
+        <antcall target="download-if-not-have" />
+    </target>
+    <target name="download-Velocity">
+        <property name="url" value="${url.default}" />
+        <property name="path" value="velocity/jars" />
+        <property name="name" value="velocity-1.5" />
+        <antcall target="download-if-not-have" />
+    </target>
+    <target name="download-Log4j">
+        <property name="url" value="${url.default}" />
+        <property name="path" value="log4j/jars" />
+        <property name="name" value="log4j-1.2.15" />
+        <antcall target="download-if-not-have" />
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
           target: compile
          - - - - - - - - - - - - - - - - - -->
-    <target name="compile">
+    <target name="compile" depends="download">
         <mkdir dir="${bin}" />
         <javac fork="yes"
                srcdir="${src}"
