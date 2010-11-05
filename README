@@ -1,1 +1,31 @@
 uuRSS - RSS Reader using local file system
+
+This is the RSS Reader software.
+This program is written by Java. It requires JRE version 5 or later.
+
+
+ * target platform
+
+     It is platform-independent because written by Java.
+     (comfirmed platforms: Linux, MacOS X, Windows XP)
+
+
+ * install
+
+     It requires to build by Ant.
+
+
+ * how to use this
+
+     Run Shell script (uurss.bat, uurss.sh) to use uuRSS.
+
+         usage: uurss(.bat/.sh) category [category2 ...]
+
+
+ * license to use
+
+     Unlimited except the following restrictions.
+
+       * We will not assume the responsibility about any damage by this program.
+         Please take full responsibility for your usage.
+       * On using runtime environment and reference libraries, please follow their permission and their licence.
