@@ -22,9 +22,9 @@
 <div class="content">
 #foreach ( $result in $results.entrySet() )
   #set ( $info = $result.key )
-<hr><h2><a href="${info.feedUrl}">${info.fullname}</a></h2>
+<hr><h2><a href="${info.url}">${info.fullname}</a></h2>
   #foreach ( $entry in $result.value )
-<h3><a href="${entry.link}">${entry.title}</a></h3>${entry.description}
+<h3><a href="${entry.link}">${entry.title}</a></h3>${entry.description.value}
   #end
 #end
 </div>
