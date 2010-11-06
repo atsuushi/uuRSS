@@ -100,7 +100,7 @@
         </javac>
         <copy todir="${bin}">
             <fileset dir="${src}">
-                <include name="version" />
+                <include name="**/version" />
                 <include name="**/*.properties" />
                 <include name="**/*.vm" />
             </fileset>
