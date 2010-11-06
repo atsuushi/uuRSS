@@ -23,8 +23,8 @@ public final class Main {
     private static final Logger log = Logger.getLogger(Main.class);
 
     private static final String NAME = "uuRSS";
-    private static final String VERSION = "($Rev$)";
-    private static final String NAMEWITHVERSION = NAME + VERSION;
+    private static final String VERSION = getResourceAsString("version");
+    private static final String NAMEWITHVERSION = String.format("%s(%s)", NAME, VERSION);
 
     private Main() {
         // empty
@@ -110,7 +110,52 @@ public final class Main {
         return summary1;
     }
 
-    static void mkdirs(File dir) {
+    private static Properties getVelocityProperties() throws IOException {
+        Properties velocityProperties = new Properties();
+        InputStream is = Main.class.getResourceAsStream("velocity.properties");
+        try {
+            velocityProperties.load(is);
+        } finally {
+            is.close();
+        }
+        return velocityProperties;
+    }
+
+    private static void generatePage(VelocityEngine velocity,
+                                     VelocityContext context,
+                                     String templateId,
+                                     File file) throws Exception {
+        final String templatePath = "uurss/" + templateId + ".vm";
+        PrintWriter out = new PrintWriter(file);
+        try {
+            velocity.mergeTemplate(templatePath, context, out);
+        } finally {
+            out.close();
+        }
+    }
+
+    private static String getResourceAsString(String name) {
+        StringBuilder buffer = new StringBuilder();
+        try {
+            InputStream is = Main.class.getResourceAsStream(name);
+            try {
+                while (true) {
+                    final int b = is.read();
+                    if (b == -1) {
+                        break;
+                    }
+                    buffer.append((char)b);
+                }
+            } finally {
+                is.close();
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        return buffer.toString();
+    }
+
+    private static void mkdirs(File dir) {
         if (dir.exists() && !dir.isDirectory()) {
             throw new IllegalStateException("not a directory: " + dir);
         }
@@ -149,58 +194,45 @@ public final class Main {
             if (log.isInfoEnabled()) {
                 log.info("create result end");
             }
-            // set up Velocity
-            // TODO to file
-            Properties p = new Properties();
-            p.setProperty("resource.loader", "class");
-            p.setProperty("class.resource.loader.class",
-                          "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-            p.setProperty("input.encoding", "Windows-31J");
-            VelocityEngine engine = new VelocityEngine(p);
+            // generate pages
+            VelocityEngine velocity = new VelocityEngine(getVelocityProperties());
             for (final String category : args) {
                 File dir = new File(root, category);
                 mkdirs(dir);
+                Summary summary1 = extractCategory(summary, category);
+                List<Integer> days = new ArrayList<Integer>(summary1.keySet());
                 // generate index page
                 if (log.isInfoEnabled()) {
                     log.info("index start: " + category);
                 }
-                Summary summary1 = extractCategory(summary, category);
-                File indexFile = new File(dir, "index.html");
-                {
-                    PrintWriter out = new PrintWriter(indexFile);
-                    try {
-                        final String template = "uurss/index.vm";
-                        VelocityContext context = new VelocityContext();
-                        context.put("title", String.format("%s [%s] index", NAME, category));
-                        context.put("version", NAMEWITHVERSION);
-                        List<Integer> days = new ArrayList<Integer>(summary1.keySet());
-                        Collections.reverse(days);
-                        context.put("summary", summary1);
-                        context.put("days", days);
-                        engine.mergeTemplate(template, context, out);
-                    } finally {
-                        out.close();
-                    }
+                try {
+                    VelocityContext context = new VelocityContext();
+                    context.put("title", String.format("%s [%s] index", NAME, category));
+                    context.put("version", NAMEWITHVERSION);
+                    Collections.reverse(days);
+                    context.put("summary", summary1);
+                    context.put("days", days);
+                    generatePage(velocity, context, "index", new File(dir, "index.html"));
+                } catch (Exception ex) {
+                    log.warn("failed to generate index of " + category, ex);
                 }
-                // generate dairy page 
+                // generates dairy page 
                 if (log.isInfoEnabled()) {
                     log.info("day start");
                 }
                 for (Integer day : summary1.keySet()) {
-                    ListMap<FeedInfo, SyndEntry> m = summary.get(day);
-                    File file = new File(dir, String.format("%08d.html", day));
-                    PrintWriter out = new PrintWriter(file);
+                    ListMap<FeedInfo, SyndEntry> m = summary1.get(day);
                     try {
-                        final String template = "uurss/day.vm";
                         VelocityContext context = new VelocityContext();
-                        context.put("title", String.format("%s [%s]", NAME, category));
+                        context.put("title", String.format("%s [%s] %s", NAME, category, day));
                         context.put("version", NAMEWITHVERSION);
                         context.put("results", m);
-                        // TODO day adjuster
                         context.put("day", day);
-                        engine.mergeTemplate(template, context, out);
-                    } finally {
-                        out.close();
+                        context.put("daylist", new DayList(days, day));
+                        generatePage(velocity, context, "day", new File(dir, "" + day + ".html"));
+                    } catch (Exception ex) {
+                        final String message = "failed to generate day page (%s, %s)";
+                        log.warn(String.format(message, category, day), ex);
                     }
                 }
             }
