@@ -54,36 +54,43 @@ public final class Main {
         return a;
     }
 
-    private static Summary getSummary(List<FeedInfo> a) throws Exception {
+    private static Summary getSummary(List<FeedInfo> a) {
         Summary summary = new Summary();
         DateFormat df = new SimpleDateFormat("yyyyMMdd");
         SyndFeedInput input = new SyndFeedInput();
         for (final FeedInfo info : a) {
-            Reader reader = new XmlReader(info.getFile());
             try {
+                Reader reader = new XmlReader(info.getFile());
+                try {
+                    if (log.isDebugEnabled()) {
+                        log.debug("parsing " + info.name);
+                    }
+                    SyndFeed feed = input.build(reader);
+                    @SuppressWarnings("unchecked")
+                    final List<SyndEntry> entries = feed.getEntries();
+                    for (SyndEntry entry : entries) {
+                        Date updated = (entry.getUpdatedDate() == null)
+                                ? entry.getPublishedDate()
+                                : entry.getUpdatedDate();
+                        final int key = Integer.parseInt(df.format(updated));
+                        if (log.isTraceEnabled()) {
+                            log.trace("entry=" + entry);
+                        }
+                        ListMap<FeedInfo, SyndEntry> m = summary.get(key);
+                        if (m == null) {
+                            m = new ListMap<FeedInfo, SyndEntry>();
+                            summary.put(key, m);
+                        }
+                        m.add(info, entry);
+                    }
+                } finally {
+                    reader.close();
+                }
+            } catch (Exception ex) {
+                log.warn(ex);
                 if (log.isDebugEnabled()) {
-                    log.debug("parsing " + info.name);
+                    log.debug("", ex);
                 }
-                SyndFeed feed = input.build(reader);
-                @SuppressWarnings("unchecked")
-                final List<SyndEntry> entries = feed.getEntries();
-                for (SyndEntry entry : entries) {
-                    Date updated = (entry.getUpdatedDate() == null)
-                            ? entry.getPublishedDate()
-                            : entry.getUpdatedDate();
-                    final int key = Integer.parseInt(df.format(updated));
-                    if (log.isTraceEnabled()) {
-                        log.trace("entry=" + entry);
-                    }
-                    ListMap<FeedInfo, SyndEntry> m = summary.get(key);
-                    if (m == null) {
-                        m = new ListMap<FeedInfo, SyndEntry>();
-                        summary.put(key, m);
-                    }
-                    m.add(info, entry);
-                }
-            } finally {
-                reader.close();
             }
         }
         return summary;
