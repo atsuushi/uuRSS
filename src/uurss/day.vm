@@ -24,7 +24,7 @@
   #set ( $info = $result.key )
 <hr><h2><a href="${info.url}">${info.fullname}</a></h2>
   #foreach ( $entry in $result.value )
-<h3><a href="${entry.link}">${entry.title}</a></h3>${entry.description.value}
+<h3><a href="${entry.link}">${entry.title}</a></h3>#if( $entry.description )${entry.description.value}#end
   #end
 #end
 </div>
