@@ -3,7 +3,11 @@
 ## set JDBCMODE if you use JDBC mode.
 # export JDBCMODE=true
 
-CP=uuRSS.jar:lib/rome-1.0.jar:lib/log4j-1.2.15.jar:lib/velocity-dep-1.5.jar:lib/jdom-1.0.jar:${CLASSPATH}
+CP=uuRSS.jar:lib/rome-1.0.0.jar
+for f in lib/*.jar
+do
+  CP=${CP}:${f}
+done
 OP=-Dresult.dir=result
 
 if [ "${JDBCMODE}" = "true" ]; then
