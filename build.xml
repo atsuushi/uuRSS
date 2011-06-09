@@ -17,7 +17,7 @@
     </path>
 
     <!-- PROPERTIES (for download) -->
-    <property name="url.default" value="http://www.ibiblio.org/maven" />
+    <property name="repo.url" value="http://search.maven.org/remotecontent?filepath=" />
     <property name="proxy.host" value="" />
     <property name="proxy.port" value="80" />
 
@@ -42,7 +42,7 @@
         <antcall target="download-Log4j" />
     </target>
     <target name="download-if-not-have">
-        <property name="lib.path" value="lib/${name}.jar" />
+        <property name="lib.path" value="lib/${artifact}-${version}.jar" />
         <condition property="exists-lib">
             <available file="${lib.path}" />
         </condition>
@@ -50,34 +50,38 @@
     </target>
     <target name="download-lib" unless="exists-lib">
         <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}" />
-        <get src="${url}/${path}/${name}.jar"
+        <get src="${url}/${group.path}/${artifact}/${version}/${artifact}-${version}.jar"
              dest="${lib.path}"
              usetimestamp="true"
              verbose="false"
              ignoreerrors="false" />
     </target>
     <target name="download-ROME">
-        <property name="url" value="https://rome.dev.java.net" />
-        <property name="path" value="dist" />
-        <property name="name" value="rome-1.0" />
+        <property name="url"        value="${repo.url}" />
+        <property name="group.path" value="net/java/dev/rome" />
+        <property name="artifact"   value="rome" />
+        <property name="version"    value="1.0.0" />
         <antcall target="download-if-not-have" />
     </target>
     <target name="download-JDOM">
-        <property name="url" value="${url.default}" />
-        <property name="path" value="jdom/jars" />
-        <property name="name" value="jdom-1.0" />
+        <property name="url"        value="${repo.url}" />
+        <property name="group.path" value="org/jdom" />
+        <property name="artifact"   value="jdom" />
+        <property name="version"    value="1.1" />
         <antcall target="download-if-not-have" />
     </target>
     <target name="download-Velocity">
-        <property name="url" value="http://archive.apache.org" />
-        <property name="path" value="dist/velocity/engine/1.5" />
-        <property name="name" value="velocity-dep-1.5" />
+        <property name="url"        value="${repo.url}" />
+        <property name="group.path" value="velocity" />
+        <property name="artifact"   value="velocity-dep" />
+        <property name="version"    value="1.5-beta2" />
         <antcall target="download-if-not-have" />
     </target>
     <target name="download-Log4j">
-        <property name="url" value="${url.default}" />
-        <property name="path" value="log4j/jars" />
-        <property name="name" value="log4j-1.2.15" />
+        <property name="url"        value="${repo.url}" />
+        <property name="group.path" value="log4j" />
+        <property name="artifact"   value="log4j" />
+        <property name="version"    value="1.2.16" />
         <antcall target="download-if-not-have" />
     </target>
 
