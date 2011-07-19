@@ -43,13 +43,27 @@ public final class Main {
             dao.close();
         }
         ExecutorService exe = Executors.newFixedThreadPool(8);
+        Map<FeedInfo, Future<?>> futureMap = new LinkedHashMap<FeedInfo, Future<?>>();
         for (final FeedInfo info : a) {
-            exe.submit(new DownloadTask(info, cachedir));
+            Future<File> future = exe.submit(new DownloadTask(info, cachedir));
+            futureMap.put(info, future);
         }
         exe.shutdown();
         // TODO go next asap
         while (!exe.awaitTermination(1, TimeUnit.SECONDS)) {
-            log.debug("waiting...");
+            int taskCount = 0;
+            for (Entry<FeedInfo, Future<?>> entry : futureMap.entrySet()) {
+                FeedInfo info = entry.getKey();
+                if (!entry.getValue().isDone()) {
+                    ++taskCount;
+                    if (log.isDebugEnabled()) {
+                        log.debug(String.format("waiting %s(%s) ...", info.getName(), info.getUrl()));
+                    }
+                }
+            }
+            if (log.isInfoEnabled()) {
+                log.info("waiting tasks = " + taskCount);
+            }
         }
         return a;
     }
