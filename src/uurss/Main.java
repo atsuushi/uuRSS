@@ -110,7 +110,7 @@ public final class Main {
         return summary;
     }
 
-    private static Summary extractCategory(Summary summary, String category) {
+    private static Summary extractByCategory(Summary summary, String category) {
         Summary summary1 = new Summary();
         for (Entry<Integer, ListMap<FeedInfo, SyndEntry>> entry : summary.entrySet()) {
             ListMap<FeedInfo, SyndEntry> v = entry.getValue();
@@ -220,7 +220,7 @@ public final class Main {
             for (final String category : args) {
                 File dir = new File(root, category);
                 mkdirs(dir);
-                Summary summary1 = extractCategory(summary, category);
+                Summary summary1 = extractByCategory(summary, category);
                 List<Integer> days = new ArrayList<Integer>(summary1.keySet());
                 // generate index page
                 if (log.isInfoEnabled()) {
