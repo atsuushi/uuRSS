@@ -51,7 +51,7 @@ final class DownloadTask implements Callable<File> {
             if (log.isDebugEnabled()) {
                 log.debug(String.format("unzip [%s]", feedFile.getName()));
             }
-            File tmp = new File(root, ".tmp.dat");
+            File tmp = new File(root, String.format("%s.tmp", feedFile.getName()));
             // unzip
             InputStream gis = new GZIPInputStream(new FileInputStream(feedFile));
             try {
