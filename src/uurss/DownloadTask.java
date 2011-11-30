@@ -49,20 +49,18 @@ final class DownloadTask implements Callable<File> {
         }
         if (isGzipFile(feedFile)) {
             if (log.isDebugEnabled()) {
-                log.debug(String.format("unzip [%s]", feedFile.getName()));
+                log.debug(String.format("gunzip [%s]", feedFile.getName()));
             }
-            File tmp = new File(root, String.format("%s.tmp", feedFile.getName()));
-            // unzip
-            InputStream gis = new GZIPInputStream(new FileInputStream(feedFile));
+            File gzfile = new File(root, feedFile.getName() + ".gz");
+            if (!feedFile.renameTo(gzfile)) {
+                throw new IOException(String.format("failed to rename %s to %s", feedFile, gzfile));
+            }
+            // gunzip
+            InputStream gis = new GZIPInputStream(new FileInputStream(gzfile));
             try {
-                transfer(gis, tmp);
+                transfer(gis, feedFile);
             } finally {
                 gis.close();
-            }
-            if (feedFile.delete() && !tmp.renameTo(feedFile)) {
-                log.warn(String.format("failed to rename [%s] to [%s]",
-                                       tmp.getName(),
-                                       feedFile.getName()));
             }
         }
         return feedFile;
