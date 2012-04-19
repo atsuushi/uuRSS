@@ -52,7 +52,7 @@ final class DownloadTask implements Callable<File> {
                 log.debug(String.format("gunzip [%s]", feedFile.getName()));
             }
             File gzfile = new File(root, feedFile.getName() + ".gz");
-            if (!feedFile.renameTo(gzfile)) {
+            if (gzfile.exists() && !gzfile.delete() || !feedFile.renameTo(gzfile)) {
                 throw new IOException(String.format("failed to rename %s to %s", feedFile, gzfile));
             }
             // gunzip
@@ -100,7 +100,11 @@ final class DownloadTask implements Callable<File> {
 
     private static String getMessageDigestString(String input) {
         StringBuilder buffer = new StringBuilder();
-        for (byte b : instance.digest(input.getBytes())) {
+        final byte[] digestBytes;
+        synchronized (instance) {
+            digestBytes = instance.digest(input.getBytes());
+        }
+        for (byte b : digestBytes) {
             buffer.append(String.format("%02X", b));
         }
         return buffer.toString();
