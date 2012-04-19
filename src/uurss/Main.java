@@ -101,7 +101,7 @@ public final class Main {
                     reader.close();
                 }
             } catch (Exception ex) {
-                log.warn(ex);
+                log.warn(String.format("%s at %s", ex, info));
                 if (log.isDebugEnabled()) {
                     log.debug("", ex);
                 }
